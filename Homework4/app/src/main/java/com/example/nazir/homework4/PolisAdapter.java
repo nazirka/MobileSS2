@@ -1,13 +1,7 @@
 package com.example.nazir.homework4;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -23,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+
 /**
  * Created by nazir on 10.08.2017.
  */
@@ -35,13 +31,12 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_polis, parent, false);
-
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bindData(items.get(position));
+        holder.bindData(this, items.get(position));
     }
 
     @Override
@@ -55,17 +50,10 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
         }
 
         items.add(entity);
-
         notifyDataSetChanged();
     }
 
-    public void updateItems(List<PolisEntity> items) {
-        if (items == null) {
-            return;
-        }
-
-        this.items = items;
-
+    private void setChangedData() {
         notifyDataSetChanged();
     }
 
@@ -73,9 +61,15 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
 
         ImageView   iconPolis;
         TextView    textPolisInfo;
-        int         textColor1;
-        int         textColor2;
+
+        int         textColor_black;
+        int         textColor_grey;
         int         textColor_red;
+
+        String      strPolisOSAGO;
+        String      strPolisKASKO;
+        String      strPolisFlat;
+        String      strPolisAid;
 
         ProgressBar progress;
         TextView    textDates;
@@ -85,6 +79,8 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
         Drawable    orangeStyle;
         Drawable    redStyle;
 
+        PolisAdapter parentAdapter;
+
 
         public ViewHolder(final View itemView){
             super(itemView);
@@ -92,8 +88,8 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
             iconPolis       = (ImageView) itemView.findViewById(R.id.image_polis);
             textPolisInfo   = (TextView) itemView.findViewById(R.id.textPolisInfo);
 
-            textColor1      = itemView.getResources().getColor(R.color.colorTextPolisType);
-            textColor2      = itemView.getResources().getColor(R.color.colorTextPolisNum);
+            textColor_black = itemView.getResources().getColor(R.color.colorTextPolisType);
+            textColor_grey  = itemView.getResources().getColor(R.color.colorTextPolisNum);
             textColor_red   = itemView.getResources().getColor(R.color.colorProgressRed);
 
             progress        = (ProgressBar) itemView.findViewById(R.id.progress);
@@ -103,69 +99,70 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
             greenStyle      = itemView.getResources().getDrawable(R.drawable.progress_green);
             orangeStyle     = itemView.getResources().getDrawable(R.drawable.progress_orange);
             redStyle        = itemView.getResources().getDrawable(R.drawable.progress_red);
+
+            strPolisOSAGO   = itemView.getResources().getString(R.string.polisOSAGO);
+            strPolisKASKO   = itemView.getResources().getString(R.string.polisKASKO);
+            strPolisFlat    = itemView.getResources().getString(R.string.polisFlat);
+            strPolisAid     = itemView.getResources().getString(R.string.polisAid);
+
+            parentAdapter   = null;
         }
 
-        public void bindData(final PolisEntity entity) {
+        public void bindData(PolisAdapter parent, final PolisEntity entity) {
 
-            String st_TextPolis = "";
-            String st_Dates = "";
+            parentAdapter = parent;
+            configurePolisInfoText(entity);
+        }
+
+        private void configurePolisInfoText(final PolisEntity entity) {
+            String strTextPolis = "";
+            String strDates = "";
+
             switch (entity.getPolisType())
             {
-                case 0:
+                case polisOsago:
                 {
                     iconPolis.setImageResource(R.drawable.icon_car);
-                    st_TextPolis = "ОСАГО ";
-
-                    SimpleDateFormat simpleDate =  new SimpleDateFormat("dd.MM.yyyy");
-                    if (entity.getPolisStart() != null)
-                        st_Dates = st_Dates + "\nс " + simpleDate.format(entity.getPolisStart());
-
-                    if (entity.getPolisEnd() != null)
-                        st_Dates = st_Dates + " по " + simpleDate.format(entity.getPolisEnd());
+                    strTextPolis = strPolisOSAGO;
+                    strDates = getDatePeriodString(entity.getPolisStart(), entity.getPolisEnd());
                 } break;
 
-                case 1:
+                case polisKasko:
                 {
                     iconPolis.setImageResource(R.drawable.icon_car_kasko);
-                    st_TextPolis = "КАСКО ";
-
-                    SimpleDateFormat simpleDate =  new SimpleDateFormat("dd.MM.yyyy");
-                    if (entity.getPolisStart() != null)
-                        st_Dates += "\nс " + simpleDate.format(entity.getPolisStart());
-
-                    if (entity.getPolisEnd() != null)
-                        st_Dates += " по " + simpleDate.format(entity.getPolisEnd());
+                    strTextPolis = strPolisKASKO;
+                    strDates = getDatePeriodString(entity.getPolisStart(), entity.getPolisEnd());
                 } break;
 
-                case 2:
+                case polisFlat:
                 {
                     iconPolis.setImageResource(R.drawable.icon_key);
-                    st_TextPolis = "Имущество ";
+                    strTextPolis = strPolisFlat;
                 } break;
 
-                case 3:
+                case polisAid:
                 {
                     iconPolis.setImageResource(R.drawable.icon_medec);
-                    st_TextPolis = "Медицинское страхование ";
+                    strTextPolis = strPolisAid;
                 } break;
             }
 
             SpannableStringBuilder builder = new SpannableStringBuilder();
 
-            SpannableString str1= new SpannableString(st_TextPolis);
-            str1.setSpan(new ForegroundColorSpan(textColor1), 0, str1.length(), 0);
+            SpannableString str1 = new SpannableString(strTextPolis + " ");
+            str1.setSpan(new ForegroundColorSpan(textColor_black), 0, str1.length(), 0);
             builder.append(str1);
 
-            SpannableString str2= new SpannableString(entity.getPolisNumber() + "\n");
-            str2.setSpan(new ForegroundColorSpan(textColor2), 0, str2.length(), 0);
+            SpannableString str2 = new SpannableString(entity.getPolisNumber() + "\n");
+            str2.setSpan(new ForegroundColorSpan(textColor_grey), 0, str2.length(), 0);
             builder.append(str2);
 
-            SpannableString str3= new SpannableString(entity.getPolisObject());
-            str3.setSpan(new ForegroundColorSpan(textColor1), 0, str3.length(), 0);
+            SpannableString str3 = new SpannableString(entity.getPolisObject() + "\n");
+            str3.setSpan(new ForegroundColorSpan(textColor_black), 0, str3.length(), 0);
             builder.append(str3);
 
-            SpannableString str4= new SpannableString(st_Dates);
-            str4.setSpan(new ForegroundColorSpan(textColor2), 0, str4.length(), 0);
+            SpannableString str4 = new SpannableString(strDates);
+            str4.setSpan(new ForegroundColorSpan(textColor_grey), 0, str4.length(), 0);
             builder.append(str4);
 
             textPolisInfo.setText(builder, TextView.BufferType.SPANNABLE);
@@ -183,12 +180,8 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
             }
             else {
                 //расчет оставшихся дней
-                long diff_ost = entity.getPolisEnd().getTime() - (new Date().getTime());
-                int ostDays = (int) (diff_ost / (1000 * 60 * 60 * 24));
-
-                long diff_all = entity.getPolisEnd().getTime() - entity.getPolisStart().getTime();
-                int ostAll = (int) (diff_all / (1000 * 60 * 60 * 24));
-
+                int ostDays = entity.countDaysBetween(new Date(),entity.getPolisEnd());
+                int ostAll =  entity.countDaysBetween(entity.getPolisStart(), entity.getPolisEnd());
                 int textDaysColor;
 
                 //окончание слово ДЕНЬ
@@ -208,14 +201,14 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
                 SpannableStringBuilder builder2 = new SpannableStringBuilder();
 
                 SpannableString str1_2 = new SpannableString("Осталось ");
-                str1_2.setSpan(new ForegroundColorSpan(textColor2), 0, str1_2.length(), 0);
+                str1_2.setSpan(new ForegroundColorSpan(textColor_grey), 0, str1_2.length(), 0);
                 builder2.append(str1_2);
 
                 if (ostDays <= 7) {
                     textDaysColor = textColor_red;
                 }
                 else {
-                    textDaysColor = textColor2;
+                    textDaysColor = textColor_grey;
                 }
 
                 SpannableString str2_2 = new SpannableString(Integer.toString(ostDays) + " " + textDaysText);
@@ -228,7 +221,7 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
                     data_str += simpleDate.format(entity.getPolisEnd());
                 data_str += ")";
                 SpannableString str3_2 = new SpannableString(data_str);
-                str3_2.setSpan(new ForegroundColorSpan(textColor2), 0, str3_2.length(), 0);
+                str3_2.setSpan(new ForegroundColorSpan(textColor_grey), 0, str3_2.length(), 0);
                 builder2.append(str3_2);
 
                 textDates.setText(builder2, TextView.BufferType.SPANNABLE);
@@ -258,15 +251,27 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
             imageBuy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    Date newDate = new Date();
                     Date endDate = new Date();
                     endDate.setYear(endDate.getYear() + 1);
 
-                    entity.setPolisStart(newDate);
+                    entity.setPolisStart(new Date());
                     entity.setPolisEnd(endDate);
+
+                    parentAdapter.setChangedData();
                 }
             });
+        }
+
+        private String getDatePeriodString(Date dateStart, Date dateEnd) {
+            SimpleDateFormat simpleDate =  new SimpleDateFormat("dd.MM.yyyy");
+            String resultStr = "";
+            if (dateStart != null)
+                resultStr = "с " + simpleDate.format(dateStart);
+
+            if (dateEnd != null)
+                resultStr += " по " + simpleDate.format(dateEnd);
+
+            return resultStr;
         }
 
     }

@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +26,37 @@ import java.util.List;
  */
 
 public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> {
+
+    static class PolisDateComparatorUp implements Comparator<PolisEntity>
+    {
+        public int compare(PolisEntity p1, PolisEntity p2) {
+            Date end1 = p1.getPolisEnd();
+            Date end2 = p2.getPolisEnd();
+
+            int res = end1.compareTo(end2);
+            if (res > 0)      return 1;
+            else
+            if (res < 0)    return -1;
+
+            return 0;
+        }
+    }
+
+    static class PolisDateComparatorDown implements Comparator<PolisEntity>
+    {
+        public int compare(PolisEntity p1, PolisEntity p2) {
+            Date end1 = p1.getPolisEnd();
+            Date end2 = p2.getPolisEnd();
+
+            int res = end1.compareTo(end2);
+            if (res > 0)      return -1;
+            else
+            if (res < 0)    return 1;
+
+            return 0;
+        }
+    }
+
 
     List<PolisEntity> items;
 
@@ -59,6 +92,19 @@ public class PolisAdapter extends RecyclerView.Adapter<PolisAdapter.ViewHolder> 
         }
 
         items = newItems;
+        notifyDataSetChanged();
+    }
+
+    public void SortItemsUp() {
+
+        PolisDateComparatorUp pc = new PolisDateComparatorUp();
+        Collections.sort(items, pc);
+        notifyDataSetChanged();
+    }
+
+    public void SortItemsDown() {
+        PolisDateComparatorDown pc = new PolisDateComparatorDown();
+        Collections.sort(items, pc);
         notifyDataSetChanged();
     }
 

@@ -6,58 +6,72 @@ import java.util.Date;
  * Created by nazir on 10.08.2017.
  */
 
+enum cPolisTypes {
+    polisOsago,
+    polisKasko,
+    polisFlat,
+    polisAid
+}
+
 public class PolisEntity {
-    private int     PolisType;
-    private String  PolisNumber;
-    private String  PolisObject;
-    private Date    PolisStart;
-    private Date    PolisEnd;
+    private cPolisTypes polisType;
+    private String      polisNumber;
+    private String      polisObject;
+    private Date        polisStart;
+    private Date        polisEnd;
 
-    public PolisEntity(int type, String number, String object, Date date_start, Date date_stop) {
-        PolisType   = type;
-        PolisNumber = number;
-        PolisObject = object;
-        PolisStart  = date_start;
-        PolisEnd    = date_stop;
+    public PolisEntity(cPolisTypes type, String number, String object, Date date_start, Date date_stop) {
+        polisType   = type;
+        polisNumber = number;
+        polisObject = object;
+        polisStart  = date_start;
+        polisEnd    = date_stop;
     }
 
-    public int getPolisType() {
-        return PolisType;
+    public cPolisTypes getPolisType() {
+        return polisType;
     }
 
-    public void setPolisType(int polisType) {
-        PolisType = polisType;
+    public void setPolisType(cPolisTypes polis_Type) {
+        polisType = polis_Type;
     }
 
     public String getPolisNumber() {
-        return PolisNumber;
+        return polisNumber;
     }
 
-    public void setPolisNumber(String polisNumber) {
-        PolisNumber = polisNumber;
+    public void setPolisNumber(String polis_Number) {
+        polisNumber = polis_Number;
     }
 
     public String getPolisObject() {
-        return PolisObject;
+        return polisObject;
     }
 
-    public void setPolisObject(String polisObject) {
-        PolisObject = polisObject;
+    public void setPolisObject(String polis_Object) {
+        polisObject = polis_Object;
     }
 
     public Date getPolisStart() {
-        return PolisStart;
+        return polisStart;
     }
 
-    public void setPolisStart(Date polisStart) {
-        PolisStart = polisStart;
+    public void setPolisStart(Date polis_Start) {
+        polisStart = polis_Start;
     }
 
     public Date getPolisEnd() {
-        return PolisEnd;
+        return polisEnd;
     }
 
-    public void setPolisEnd(Date polisEnd) {
-        PolisEnd = polisEnd;
+    public void setPolisEnd(Date polis_End) {
+        polisEnd = polis_End;
+    }
+
+    public int countDaysBetween(Date D1, Date D2) {
+        if ((D1 == null) || (D2 == null))   return 0;
+
+        long diff_ost = D2.getTime() - D1.getTime();
+        return (int) (diff_ost / (3600000 * 24));
     }
 }

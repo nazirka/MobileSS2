@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.jakewharton.rxbinding.view.RxView;
 
@@ -27,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recycler;
     PolisAdapter adapter;
 
+    ImageView buttonSortUpImage;
+    ImageView buttonSortDownImage;
+
     List<PolisEntity> items;
 
     @Override
@@ -36,6 +41,26 @@ public class MainActivity extends AppCompatActivity {
 
         configureViews();
         configureRecyclerView();
+        configureSortingButtons();
+    }
+
+    private void configureSortingButtons() {
+        buttonSortUpImage = (ImageView) findViewById(R.id.imageSortUp);
+        buttonSortDownImage =(ImageView) findViewById(R.id.imageSortDown);
+
+        buttonSortUpImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                adapter.SortItemsUp();
+            }
+        });
+
+        buttonSortDownImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                adapter.SortItemsDown();
+            }
+        });
     }
 
     public  void  loadPolises() {
@@ -64,14 +89,15 @@ public class MainActivity extends AppCompatActivity {
         adapter = new PolisAdapter();
         recycler.setAdapter(adapter);
 
+        loadPolises();
+        adapter.setNewItems(items);
+
         //Observable.just("Load polises")
-        Observable.just(items)
+     /*   Observable.just(items)
                 .subscribeOn(Schedulers.io())
-                .map(loadPolises())
+                .map(cmd -> loadPolises())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
-        /*
-                .subscribe(new Subscriber<String>() {
+                .subscribe(new Subscriber<PolisEntity>() {
                     @Override
                     public void onCompleted() {
                         //showToast( "Completed");
@@ -83,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onNext(String s) {
+                    public void onNext(PolisEntity s) {
                         //showToast(s);
                     }
 
@@ -115,9 +141,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });*/
 
-
-
-
     /*
         adapter.addItem(new PolisEntity(polisOsago, "EEE0858555888", "Nissan Qashqai", new Date(2016-1900, 8-1, 20), new Date(2017-1900, 8-1, 19)));
         adapter.addItem(new PolisEntity(polisFlat, "EAE0858555887", "г.Москва, ул Дмитриевского, д. 5, кв. 55", new Date(2016-1900, 9-1, 12), new Date(2017-1900, 9-1, 11)));
@@ -131,8 +154,4 @@ public class MainActivity extends AppCompatActivity {
         adapter.addItem(new PolisEntity(polisFlat, "EAE0858555887", "г.Самара, ул Тюполева, д. 89, кв. 235", new Date(2016-1900, 9-1, 11), new Date(2017-1900, 9-1, 10)));
         */
     }
-
-
-
-
 }
